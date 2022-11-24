@@ -63,7 +63,10 @@ export default class FirebaseAuthenticator extends BaseAuthenticator {
         const unsubscribe = onAuthStateChanged(
           auth,
           async (user) => {
-            console.log('authenticator.restore - `onAuthChanged` triggered');
+            console.log(
+              'authenticator.restore - `onAuthChanged` triggered',
+              JSON.parse(JSON.stringify(user))
+            );
             if (unsubscribe) {
               console.log('authenticator.restore - `unsubscribe` called');
             }
