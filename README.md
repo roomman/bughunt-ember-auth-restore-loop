@@ -17,5 +17,3 @@ In terms of `ember-simple-auth`, this repo includes a custom authenticator. Howe
 7. check the console on the second tab; you will see the following error: `The authenticator "authenticator:test-firebase" rejected to restore the session - invalidating…`
 8. return to the first tab and click "Submit" again, and check the console in both tabs; you should see a that the console is logging continuously as the application gets stuck in a loop
 9. click the "Logout" link to invalidate the session
-
-I have logged out the `user` object and the `idToken` is different in each, so resolving it causes `ember-simple-auth` to trigger it's own listener that calls `restore()`. At some point, both sessions agree on a user and the loop stops.
