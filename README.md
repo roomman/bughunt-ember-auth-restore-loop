@@ -10,10 +10,12 @@ In terms of `ember-simple-auth`, this repo includes a custom authenticator. Howe
 
 1. clone the repo
 2. `npm install`
-3. in individual terminal windows, run each of these commands: `ember serve`, `firebase emulators:start --import=test-data`, and `npm run tailwind`
+3. in individual terminal windows, run each of these commands: `ember serve` and `firebase emulators:start --import=test-data`
 4. open a browser and navigate to `http://localhost:4200`, and open your console to view logs
 5. repeat step 4 in a second browser tab
-6. in the first browser tab, click "Submit"
+6. in the first browser tab, click "Submit" - it will not log you in
 7. check the console on the second tab; you will see the following error: `The authenticator "authenticator:test-firebase" rejected to restore the session - invalidating…`
 8. return to the first tab and click "Submit" again, and check the console in both tabs; you should see a that the console is logging continuously as the application gets stuck in a loop
 9. click the "Logout" link to invalidate the session
+
+I have logged out the `user` object and the `idToken` is different in each, so resolving it causes `ember-simple-auth` to trigger it's own listener that calls `restore()`. At some point, both sessions agree on a user and the loop stops.
