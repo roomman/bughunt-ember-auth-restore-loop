@@ -1,56 +1,19 @@
 # bughunt-ember-auth-restore-loop
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+This repo contains a minimal reproduction of a bug that exists in the interaction between `ember-simple-auth` and `firebase`, as implemented in the `ember-cloud-firestore-adapter` addon.
 
-## Prerequisites
+The application has a very basic authentication flow. A login page has pre-populated credentials, which match those of a user in the emulator. Once logged in, the user is redirected to `authenticated.index` and their `displayName` from firebase auth should be visible. Upon logout, the user is redirected to the login page.
 
-You will need the following things properly installed on your computer.
+In terms of `ember-simple-auth`, this repo includes a custom authenticator. However, it is a copy of the default provided by `ember-cloud-firestore-adapter` but with some logging. Essentially, I believe this highlights an issue for anyone using the default authenticator.
 
-* [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
-* [Ember CLI](https://ember-cli.com/)
-* [Google Chrome](https://google.com/chrome/)
+## Steps to reproduce
 
-## Installation
-
-* `git clone <repository-url>` this repository
-* `cd bughunt-ember-auth-restore-loop`
-* `npm install`
-
-## Running / Development
-
-* `ember serve`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-* Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
-
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
-
-### Running Tests
-
-* `ember test`
-* `ember test --server`
-
-### Linting
-
-* `npm run lint`
-* `npm run lint:fix`
-
-### Building
-
-* `ember build` (development)
-* `ember build --environment production` (production)
-
-### Deploying
-
-Specify what it takes to deploy your app.
-
-## Further Reading / Useful Links
-
-* [ember.js](https://emberjs.com/)
-* [ember-cli](https://ember-cli.com/)
-* Development Browser Extensions
-  * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
-  * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
+1. clone the repo
+2. `npm install`
+3. in individual terminal windows, run each of these commands: `ember serve`, `firebase emulators:start --import=test-data`, and `npm run tailwind`
+4. open a browser and navigate to `http://localhost:4200`, and open your console to view logs
+5. repeat step 4 in a second browser tab
+6. in the first browser tab, click "Submit"
+7. check the console on the second tab; you will see the following error: `The authenticator "authenticator:test-firebase" rejected to restore the session - invalidating…`
+8. return to the first tab and click "Submit" again, and check the console in both tabs; you should see a that the console is logging continuously as the application gets stuck in a loop
+9. click the "Logout" link to invalidate the session

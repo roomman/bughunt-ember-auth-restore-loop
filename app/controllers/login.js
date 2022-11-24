@@ -6,18 +6,16 @@ import { service } from '@ember/service';
 import { signInWithEmailAndPassword } from 'ember-cloud-firestore-adapter/firebase/auth';
 
 export default class LoginController extends Controller {
-  @tracked email = 'simon@mysolomon.co.uk';
+  @tracked email = 'test@solomoncrm.com';
   @tracked password = 'password';
 
   @service session;
 
   @action
   async login(e) {
-    debugger;
     e.preventDefault();
-    await this.session.authenticate('authenticator:firebase', (auth) => {
+    await this.session.authenticate('authenticator:test-firebase', (auth) => {
       return signInWithEmailAndPassword(auth, this.email, this.password);
     });
-    debugger;
   }
 }
