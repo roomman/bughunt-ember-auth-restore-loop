@@ -1,0 +1,15 @@
+{{page-title 'Login'}}
+<div>
+  <label>
+    Email
+    <Input @type='text' @value={{this.email}} />
+  </label>
+  <label>
+    Password
+    <Input @type='password' @value={{this.password}} />
+  </label>
+</div>
+<button type='submit' {{on 'click' this.login}}>
+  Login
+</button>
+{{outlet}}

@@ -1,7 +1,28 @@
-{{page-title "BughuntEmberAuthRestoreLoop"}}
-
-{{!-- The following component displays Ember's default welcome message. --}}
-<WelcomePage />
-{{!-- Feel free to remove this! --}}
-
+{{page-title 'Application'}}
+<h1 class='text-blue-500 font-medium text-3xl'>
+  Test Application
+</h1>
+<div class='space-x-2'>
+  <LinkTo
+    @route='authenticated.index'
+    class='underline hover:text-slate-700 text-slate-500'
+  >
+    Authenticated Route
+  </LinkTo>
+  <LinkTo @route='login' class='underline hover:text-slate-700 text-slate-500'>
+    Login
+  </LinkTo>
+  {{#if this.session.isAuthenticated}}
+    <button
+      type='button'
+      class='underline hover:text-slate-700 text-slate-500'
+      {{on 'click' this.logout}}
+    >
+      Logout
+    </button>
+  {{/if}}
+</div>
 {{outlet}}
+{{#if this.session.isAuthenticated}}
+  You are signed in as {{this.session.data.authenticated.user.displayName}}
+{{/if}}

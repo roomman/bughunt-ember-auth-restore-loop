@@ -21,6 +21,32 @@ module.exports = function (environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
+
+    'ember-cloud-firestore-adapter': {
+      firebaseConfig: {
+        apiKey: 'AIzaSyDvxiOQMKRlAsr2V_8dr-E_boH7i5z8n60',
+        authDomain: 'solomon-firebase-testing.firebaseapp.com',
+        projectId: 'solomon-firebase-testing',
+        storageBucket: 'solomon-firebase-testing.appspot.com',
+        messagingSenderId: '427837124089',
+        appId: '1:427837124089:web:24399a8fed3c6872046128',
+        measurementId: 'G-QVR9F2MQSW',
+      },
+
+      firestore: {
+        emulator: {
+          hostname: 'localhost',
+          port: 8080,
+        },
+      },
+
+      auth: {
+        emulator: {
+          hostname: 'localhost',
+          port: 9099,
+        },
+      },
+    },
   };
 
   if (environment === 'development') {
