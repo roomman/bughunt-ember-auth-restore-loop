@@ -1,99 +1,86 @@
-import { getOwner } from '@ember/application';
-
 import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
 
 import {
   getAuth,
-  getRedirectResult,
   onAuthStateChanged,
-  signInWithCustomToken,
+  getIdTokenResult,
   signOut,
 } from 'ember-cloud-firestore-adapter/firebase/auth';
 
-export default class FirebaseAuthenticator extends BaseAuthenticator {
-  get fastboot() {
-    return getOwner(this).lookup('service:fastboot');
-  }
+const auth = getAuth();
 
+function parseCherryPickedUser(user) {
+  return {
+    displayName: user.displayName,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    photoURL: user.photoURL,
+    providerId: user.providerId,
+    uid: user.uid,
+    emailVerified: user.emailVerified,
+    isAnonymous: user.isAnonymous,
+    providerData: user.providerData,
+    refreshToken: user.refreshToken,
+    tenantId: user.tenantId,
+  };
+}
+
+function parseCherryPickedClaims(claims) {
+  return {
+    accessControl: claims.accessControl,
+    admin: claims.admin,
+    email: claims.email,
+    email_verified: claims.email_verified,
+    name: claims.name,
+    presenterId: claims.presenterId,
+    subscription: claims.subscription,
+    user_id: claims.user_id,
+  };
+}
+
+export default class FirebaseAuthenticator extends BaseAuthenticator {
   async authenticate(callback) {
     console.log('authenticator.authenticate - called');
 
-    const auth = getAuth();
     const credential = await callback(auth);
 
-    return { user: credential.user };
+    const token = await getIdTokenResult(credential.user, true);
+
+    return {
+      user: parseCherryPickedUser(credential.user),
+      claims: parseCherryPickedClaims(token.claims),
+    };
   }
 
   invalidate() {
     console.log('authenticator.invalidate - called');
-
-    const auth = getAuth();
 
     return signOut(auth);
   }
 
   restore() {
     return new Promise((resolve, reject) => {
-      console.log('authenticator.restore - called');
-
       const auth = getAuth();
 
-      if (
-        this.fastboot?.isFastBoot &&
-        this.fastboot.request.headers
-          .get('Authorization')
-          ?.startsWith('Bearer ')
-      ) {
-        const token = this.fastboot.request.headers
-          .get('Authorization')
-          ?.split('Bearer ')[1];
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        async (user) => {
+          unsubscribe();
 
-        if (token) {
-          signInWithCustomToken(auth, token)
-            .then((credential) => {
-              resolve({ user: credential.user });
-            })
-            .catch(() => {
-              reject();
+          if (user) {
+            const freshToken = await getIdTokenResult(user, true);
+
+            resolve({
+              authUser: parseCherryPickedUser(user),
+              claims: parseCherryPickedClaims(freshToken.claims),
             });
-        } else {
+          }
+        },
+        () => {
+          unsubscribe();
           reject();
         }
-      } else {
-        const unsubscribe = onAuthStateChanged(
-          auth,
-          async (user) => {
-            console.log(
-              'authenticator.restore - `onAuthChanged` triggered',
-              user
-            );
-            if (unsubscribe) {
-              console.log('authenticator.restore - `unsubscribe` called');
-            }
-            unsubscribe();
-
-            if (user) {
-              resolve({ user });
-            } else {
-              getRedirectResult(auth)
-                .then((credential) => {
-                  if (credential) {
-                    resolve({ user: credential.user });
-                  } else {
-                    reject();
-                  }
-                })
-                .catch(() => {
-                  reject();
-                });
-            }
-          },
-          () => {
-            reject();
-            unsubscribe();
-          }
-        );
-      }
+      );
     });
   }
 }

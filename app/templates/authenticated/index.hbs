@@ -2,4 +2,14 @@
 <p>
   You are signed in as {{this.session.data.authenticated.user.displayName}}
 </p>
+<div>
+  <p>
+    There are the database users:
+  </p>
+  {{#each @model as |user|}}
+    <p>
+      {{user.firstName}} {{user.lastName}}
+    </p>
+  {{/each}}
+</div>
 {{outlet}}
