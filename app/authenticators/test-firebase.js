@@ -2,6 +2,7 @@ import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
 
 import {
   getAuth,
+  getRedirectResult,
   onAuthStateChanged,
   getIdTokenResult,
   signOut,
@@ -74,6 +75,18 @@ export default class FirebaseAuthenticator extends BaseAuthenticator {
               user: parseCherryPickedUser(user),
               claims: parseCherryPickedClaims(freshToken.claims),
             });
+          } else {
+            getRedirectResult(auth)
+              .then((credential) => {
+                if (credential) {
+                  resolve({ authUser: credential.user });
+                } else {
+                  reject();
+                }
+              })
+              .catch(() => {
+                reject();
+              });
           }
         },
         () => {
