@@ -71,7 +71,7 @@ export default class FirebaseAuthenticator extends BaseAuthenticator {
             const freshToken = await getIdTokenResult(user, true);
 
             resolve({
-              authUser: parseCherryPickedUser(user),
+              user: parseCherryPickedUser(user),
               claims: parseCherryPickedClaims(freshToken.claims),
             });
           }
